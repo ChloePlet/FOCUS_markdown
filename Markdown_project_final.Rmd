@@ -22,6 +22,8 @@ knitr::opts_chunk$set(
 library(tidyverse)
 library(kableExtra)
 library(sf)
+library(ggplot2)
+library(gganimate)
 
 #read files and create dataframes
 Field_NSW<-read_csv("resources/results/Obs_Field_simple.csv")
@@ -89,8 +91,8 @@ Temperature_plot<- ggplot(data = Field_NSW,
 Temperature_plot+
   labs(title = "Water Temperature",
      x = "longitude",
-     y = "latitude")
-
+     y = "latitude")+
+  transition_states(Temperature, transition_length = 5, state_length = 3)
 
 
 
