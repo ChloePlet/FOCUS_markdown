@@ -33,8 +33,10 @@ S_Cobar_tidy<-S_Cobar %>%
 Obs_Field_NSW<-full_join(Geochem1_tidy, S_Cobar_tidy) %>% 
     rename(pH = PreferredPH) %>% 
     mutate(Eh = round(PreferredEh, digits = 0)) %>% 
-  select(-SampleID, - StationDeposit, -Accuracy, -m_asl, -PreferredEh)
+    select(-SampleID, - StationDeposit, -Accuracy, -m_asl, -PreferredEh)
 
+write_csv(Obs_Field_NSW, path = "resources/results/Obs_Field_simple.csv", na = "NA", append = FALSE, col_names = TRUE,
+          quote_escape = FALSE)
 
 Temperature_plot<- ggplot(data = Obs_Field_NSW,
        mapping=aes(x = Longitude, 
