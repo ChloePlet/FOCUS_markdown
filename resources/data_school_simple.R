@@ -30,7 +30,7 @@ S_Cobar_tidy<-S_Cobar %>%
   #mutate(WaterTable_depth_m = sub("[^0-9]*([0-9\\.]*).*","\\1",Minex_S_Cobar$WaterTable))
   select(16,1,2,5:10,12:15)
 
-Obs_Field_NSW<-full_join(Geochem1_tidy, S_Cobar_tidy) %>% 
+Field_NSW<-full_join(Geochem1_tidy, S_Cobar_tidy) %>% 
     rename(pH = PreferredPH) %>% 
     mutate(Eh = round(PreferredEh, digits = 0)) %>% 
     select(-SampleID, - StationDeposit, -Accuracy, -m_asl, -PreferredEh)
@@ -38,7 +38,7 @@ Obs_Field_NSW<-full_join(Geochem1_tidy, S_Cobar_tidy) %>%
 write_csv(Obs_Field_NSW, path = "resources/results/Obs_Field_simple.csv", na = "NA", append = FALSE, col_names = TRUE,
           quote_escape = FALSE)
 
-Temperature_plot<- ggplot(data = Obs_Field_NSW,
+Temperature_plot<- ggplot(data = Field_NSW,
        mapping=aes(x = Longitude, 
                    y = Latitude,
                    colour = Temperature,
@@ -48,13 +48,12 @@ Temperature_plot<- ggplot(data = Obs_Field_NSW,
       low = "lightblue1", mid = "royalblue1", high = "firebrick1",midpoint = 18, space = "Lab", guide = "colourbar", aesthetics = "colour")+
 
 
-
 Temperature_plot+
   labs(title = "Water Temperature",
      x = "longitude",
      y = "latitude")
 
-pHEh_plot<- ggplot(data = Obs_Field_NSW,
+pHEh_plot<- ggplot(data = Field_NSW,
                 mapping=aes(x = Longitude, 
                             y = Latitude,
                             size = PreferredPH,
