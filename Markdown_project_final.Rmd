@@ -26,6 +26,9 @@ library(ggplot2)
 library(colorspace)
 library(gganimate)
 
+install.packages("gifski")
+install.packages("Rtools")
+
 #read files and create dataframes
 Field_NSW<-read_csv("resources/results/Obs_Field_simple.csv")
 ```
@@ -71,6 +74,9 @@ knitr::kable(head(Field_NSW, n = 5), format = "html", caption = "Field data") %>
 state_borders <- read_sf("resources/AUS_states") %>%
   st_simplify(dTolerance = 0.01)
 
+
+    
+
 Temperature_plot<- ggplot(data = subset(Field_NSW, !is.na(Temperature)),
        mapping=aes(x = Longitude, 
                    y = Latitude,
@@ -78,19 +84,31 @@ Temperature_plot<- ggplot(data = subset(Field_NSW, !is.na(Temperature)),
                   ))+
   geom_sf(data = state_borders, inherit.aes = F)+
          geom_point()+
-     scale_color_gradient2(low = "lightblue1", mid = "royalblue1", high = "firebrick1",midpoint = 18, space = "Lab", guide = "colourbar", aesthetics = "colour")+
+     scale_color_gradient2(low = "royalblue1", mid = "gold1", high = "firebrick1",midpoint = 18, space = "Lab", guide = "colourbar", aesthetics = "colour")+
   scale_x_continuous(limits =  c(140,154)) + 
-  scale_y_continuous(limits = c(-38,-28))
+  scale_y_continuous(limits = c(-38,-28))+
+  theme(panel.background = element_rect(fill = "lightblue"), panel.grid= element_blank())
 
-Conductivity_plot<- ggplot(data = subset(Field_NSW, !is.na(Conductivity)),
-                 mapping= aes(x= Longitude, 
-                              y= Latitude, 
-                              colour = Conductivity))+
-  geom_sf(data = state_borders, inherit.aes= F)+
-  geom_point()+
-  scale_color_gradient2(low= "cadetblue1", high= "chocolate1", midpoint= 6000, space = "Lab", guide = "colourbar", aesthetics = "colour")+ #need to fix colour scale
-  scale_x_continuous(limits =  c(140,154)) + 
-  scale_y_continuous(limits = c(-38,-28))
+ggsave("Temperature_plot.eps", plot= Temperature_plot, device = "eps", dpi = 300)
+
+anim_Temperature<-Temperature_plot+
+    transition_states(Temperature)+
+     shadow_mark(past = TRUE, future = FALSE, alpha = alpha/2)
+
+#(anim_Temperature)
+
+anim_save("saved_animation.gif", anim_Temperature)
+
+
+#Conductivity_plot<- ggplot(data = subset(Field_NSW, !is.na(Conductivity)),
+                 #mapping= aes(x= Longitude, 
+                            #  y= Latitude, 
+                            #  colour = Conductivity))+
+  #geom_sf(data = state_borders, inherit.aes= F)+
+ # geom_point()+
+ # scale_color_gradient2(low= "cadetblue1", high= "chocolate1", midpoint= 6000, space = "Lab", guide = "colourbar", aesthetics = "colour")+ #need to fix colour scale
+  #scale_x_continuous(limits =  c(140,154)) + 
+  #scale_y_continuous(limits = c(-38,-28))
 
 
 pH_plot<- ggplot(data = subset(Field_NSW, !is.na(pH)), 
