@@ -95,9 +95,7 @@ anim_Temperature<-Temperature_plot+
     transition_states(Temperature)+
      shadow_mark(past = TRUE, future = FALSE, alpha = alpha/2)
 
-#(anim_Temperature)
-
-anim_save("saved_animation.gif", anim_Temperature)
+animate(anim_Temperature)
 
 
 #Conductivity_plot<- ggplot(data = subset(Field_NSW, !is.na(Conductivity)),
@@ -119,7 +117,15 @@ pH_plot<- ggplot(data = subset(Field_NSW, !is.na(pH)),
   geom_point()+
   scale_color_gradient2(low= "gray0", mid = "cyan2", high= "chartreuse", midpoint= 8, space = "Lab", guide = "colourbar", aesthetics = "colour")+
   scale_x_continuous(limits =  c(140,154)) + 
-  scale_y_continuous(limits = c(-38,-28))
+  scale_y_continuous(limits = c(-38,-28))+
+  theme(panel.background = element_rect(fill = "lightblue"), panel.grid= element_blank())
+
+
+anim_pH<-pH_plot+
+    transition_states(pH)+
+     shadow_mark(past = TRUE, future = FALSE, alpha = alpha/2)
+
+animate(anim_pH)
 
 Eh_plot<- ggplot(data = subset(Field_NSW,!is.na(Eh)),
                  mapping= aes(x= Longitude, 
@@ -129,9 +135,14 @@ Eh_plot<- ggplot(data = subset(Field_NSW,!is.na(Eh)),
   geom_point()+
   scale_color_gradient2(low = "steelblue1", mid = "hotpink", high = "sienna1", midpoint = 120, space = "Lab", guide = "colourbar", aesthetics = "colour")+
   scale_x_continuous(limits =  c(140,154)) + 
-  scale_y_continuous(limits = c(-38,-28))
+  scale_y_continuous(limits = c(-38,-28))+
+  theme(panel.background = element_rect(fill = "lightblue"), panel.grid= element_blank())
 
+anim_Eh<-Eh_plot+
+   transition_states(Eh)+
+     shadow_mark(past = TRUE, future = FALSE, alpha = alpha/2)
 
+animate(anim_Eh)
 
 ```
 
