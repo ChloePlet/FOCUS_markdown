@@ -1,6 +1,9 @@
 library(tidyverse)
 library(RColorBrewer)
 library(cowplot)
+library(ggplot2)
+library(gganimate)
+theme_set(theme_bw())
 
 S_Cobar<-read_csv("data/NSWSouthCobar_Entity-WaterSample.csv")
 
@@ -33,7 +36,7 @@ S_Cobar_tidy<-S_Cobar %>%
 Field_NSW<-full_join(Geochem1_tidy, S_Cobar_tidy) %>% 
     rename(pH = PreferredPH) %>% 
     mutate(Eh = round(PreferredEh, digits = 0)) %>% 
-    select(-SampleID, - StationDeposit, -Accuracy, -m_asl, -PreferredEh)
+    select(-SampleID, - StationDeposit, -Accuracy, -m_asl, -PreferredEh, -Conductivity)
 
 write_csv(Obs_Field_NSW, path = "resources/results/Obs_Field_simple.csv", na = "NA", append = FALSE, col_names = TRUE,
           quote_escape = FALSE)
@@ -48,17 +51,20 @@ Temperature_plot<- ggplot(data = Field_NSW,
       low = "lightblue1", mid = "royalblue1", high = "firebrick1",midpoint = 18, space = "Lab", guide = "colourbar", aesthetics = "colour")+
 
 
+
+  
 Temperature_plot+
   labs(title = "Water Temperature",
      x = "longitude",
-     y = "latitude")
+     y = "latitude")+
+  transition_states(Temperature, transition_length = 5, state_length = 3)
 
 pHEh_plot<- ggplot(data = Field_NSW,
                 mapping=aes(x = Longitude, 
                             y = Latitude,
-                            size = PreferredPH,
-                            colour = PreferredEh ))+
-  geom_point(alpha = 0.4)+
-  scale_color_gradient2(low = "grey0", mid = "blue2", high = "deeppink1")
+                            size = pH,
+                            colour = Eh ))+
+  geom_point(alpha = 0.6)+
+  scale_color_gradient2(low = "black", mid = "blue2", high = "red")
   
                 
