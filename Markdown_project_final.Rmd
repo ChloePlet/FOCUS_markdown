@@ -71,7 +71,7 @@ knitr::kable(head(Field_NSW, n = 5), format = "html", caption = "Field data") %>
 state_borders <- read_sf("resources/AUS_states") %>%
   st_simplify(dTolerance = 0.01)
 
-Temperature_plot<- ggplot(data = Field_NSW,
+Temperature_plot<- ggplot(data = subset(Field_NSW, !is.na(Temperature)),
        mapping=aes(x = Longitude, 
                    y = Latitude,
                    colour = Temperature
@@ -82,7 +82,18 @@ Temperature_plot<- ggplot(data = Field_NSW,
   scale_x_continuous(limits =  c(140,154)) + 
   scale_y_continuous(limits = c(-38,-28))
 
-pH_plot<- ggplot(data = Field_NSW, 
+Conductivity_plot<- ggplot(data = subset(Field_NSW, !is.na(Conductivity)),
+                 mapping= aes(x= Longitude, 
+                              y= Latitude, 
+                              colour = Conductivity))+
+  geom_sf(data = state_borders, inherit.aes= F)+
+  geom_point()+
+  scale_color_gradient2(low= "cadetblue1", high= "chocolate1", midpoint= 6000, space = "Lab", guide = "colourbar", aesthetics = "colour")+ #need to fix colour scale
+  scale_x_continuous(limits =  c(140,154)) + 
+  scale_y_continuous(limits = c(-38,-28))
+
+
+pH_plot<- ggplot(data = subset(Field_NSW, !is.na(pH)), 
                  mapping= aes(x= Longitude, 
                               y= Latitude, 
                               colour = pH))+
@@ -92,7 +103,7 @@ pH_plot<- ggplot(data = Field_NSW,
   scale_x_continuous(limits =  c(140,154)) + 
   scale_y_continuous(limits = c(-38,-28))
 
-Eh_plot<- ggplot(data = Field_NSW, 
+Eh_plot<- ggplot(data = subset(Field_NSW,!is.na(Eh)),
                  mapping= aes(x= Longitude, 
                               y= Latitude, 
                               colour = Eh))+
