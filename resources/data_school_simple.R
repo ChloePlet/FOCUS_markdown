@@ -38,8 +38,15 @@ Field_NSW<-full_join(Geochem1_tidy, S_Cobar_tidy) %>%
     mutate(Eh = round(PreferredEh, digits = 0)) %>% 
     select(-SampleID, - StationDeposit, -Accuracy, -m_asl, -PreferredEh, -Conductivity)
 
-write_csv(Obs_Field_NSW, path = "resources/results/Obs_Field_simple.csv", na = "NA", append = FALSE, col_names = TRUE,
+write_csv(Field_NSW, path = "resources/results/Obs_Field_simple.csv", na = "NA", append = FALSE, col_names = TRUE,
           quote_escape = FALSE)
+
+Field_NSW_figs<-Field_NSW %>% 
+  mutate(pH_group = case_when(ph<7 ~ "pH < 7", between(pH, 7,9) ~ "7 < pH <9", ph>9 ~ "pH > 9")) %>% 
+  mutate(Eh_group= case_when(Eh<-100 ~ "Eh < -100", between (Eh, -100, 0) ~ "-100 < Eh < 0", between (Eh, 0, 100) ~ "0 < Eh < 100",
+                             between(Eh, 100, 200)~"100 < Eh < 200", Eh>200 ~ "Eh > 200")) %>% 
+  mutate(Conductivity_group = case_when)
+  
 
 Temperature_plot<- ggplot(data = Field_NSW,
        mapping=aes(x = Longitude, 
