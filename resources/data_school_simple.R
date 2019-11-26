@@ -36,17 +36,24 @@ S_Cobar_tidy<-S_Cobar %>%
 Field_NSW<-full_join(Geochem1_tidy, S_Cobar_tidy) %>% 
     rename(pH = PreferredPH) %>% 
     mutate(Eh = round(PreferredEh, digits = 0)) %>% 
-    select(-SampleID, - StationDeposit, -Accuracy, -m_asl, -PreferredEh, -Conductivity)
+    select(-SampleID, - StationDeposit, -Accuracy, -m_asl, -PreferredEh)
 
 write_csv(Field_NSW, path = "resources/results/Obs_Field_simple.csv", na = "NA", append = FALSE, col_names = TRUE,
           quote_escape = FALSE)
 
 Field_NSW_figs<-Field_NSW %>% 
-  mutate(pH_group = case_when(ph<7 ~ "pH < 7", between(pH, 7,9) ~ "7 < pH <9", ph>9 ~ "pH > 9")) %>% 
-  mutate(Eh_group= case_when(Eh<-100 ~ "Eh < -100", between (Eh, -100, 0) ~ "-100 < Eh < 0", between (Eh, 0, 100) ~ "0 < Eh < 100",
+    mutate(pH_group = case_when(pH<7 ~ "pH < 7", between(pH, 7,9) ~ "7 < pH <9", pH>9 ~ "pH > 9")) %>% 
+    mutate(Eh_group= case_when(Eh< -100 ~ "Eh < -100", between (Eh, -100, 0) ~ "-100 < Eh < 0", between (Eh, 0, 100) ~ "0 < Eh < 100",
                              between(Eh, 100, 200)~"100 < Eh < 200", Eh>200 ~ "Eh > 200")) %>% 
-  mutate(Conductivity_group = case_when)
+    mutate(Conductivity_group = case_when(between(Conductivity, 0, 2500)~"0 - 2500", between(Conductivity, 2501, 5000) ~ "2501 - 5000",
+                                        between(Conductivity, 5001, 7500)~ "5001 - 7500",between(Conductivity, 7501, 10000)~ "7501 - 10000", 
+                                        between(Conductivity,10000, 20000)~ " 10000 - 20000", Conductivity>20000 ~ "> 20000")) %>% 
+    mutate(pH_group = factor(pH_group, levels = c("pH < 7", "7 < pH < 9", "pH > 9"))) %>% 
+    mutate(Eh_group = factor(Eh_group, levels = c("Eh < -100","-100 < Eh < 0", "0 < Eh < 100", "100 < Eh < 200", "Eh > 200"))) %>% 
+    mutate(Conductivity_group = factor(Conductivity_group, levels = c("0 - 2500", "2501 - 5000", "5001 - 7500", "7501 - 10000", " 10000 - 20000", "> 20000"  )))
   
+write_csv(Field_NSW_figs, path = "resources/results/Obs_Field_simple.csv", na = "NA", append = FALSE, col_names = TRUE,
+          quote_escape = FALSE)
 
 Temperature_plot<- ggplot(data = Field_NSW,
        mapping=aes(x = Longitude, 
