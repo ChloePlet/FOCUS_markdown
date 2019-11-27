@@ -3,7 +3,7 @@ title: NSW Groundwater hydrogeochemistry
 subtitle: Field analyses
 author: Chloe Plet
 affiliation: "CSIRO Mineral Resources - Team: Minerals and Water" # Or group/team
-photo: resources/img/photo.jpeg
+photo: resources/img/photo_chloe.jpg
 
 #short_title: Optional short title
 
@@ -23,16 +23,21 @@ library(tidyverse)
 library(kableExtra)
 library(sf)
 library(ggplot2)
-library(colorspace)
 library(gganimate)
+library(cowplot)
 
 
 
 #read files and create dataframes
 Field_NSW<-read_csv("resources/results/Obs_Field_simple.csv")
 Field_NSW_figs<- read_csv("resources/results/Obs_Field_simple_figs.csv")
-```
 
+Field_NSW_figs<-Field_NSW_figs %>%
+    mutate(pH_group = factor(pH_group, levels = c("pH < 7", "7 < pH < 9", "pH > 9"))) %>% 
+    mutate(Eh_group = factor(Eh_group, levels = c("Eh < -100","-100 < Eh < 0", "0 < Eh < 100", "100 < Eh < 200", "Eh > 200"))) %>% 
+    mutate(Conductivity_group = factor(Conductivity_group, levels = c("0 - 2500", "2501 - 5000", "5001 - 7500", "7501 - 10000", " 10000 - 20000", "> 20000"  )))
+
+```
 
 # Introduction
 
@@ -67,7 +72,7 @@ knitr::kable(head(Field_NSW, n = 5), format = "html", caption = "Field data") %>
 ![](resources/img/tidyverse.png){width=100px}
 
 **Plots from R**
-```{r standard-plot, out.width='60%', fig.align='center', fig.height= 4, fig.width=6, fig.cap="Yet another gapminder plot"}
+```{r temperature-plot, out.width='60%', fig.align='center', fig.height= 4, fig.width=6, fig.cap="groundwater temperature"}
   
 # Read the state shapes in and simplify them for faster plotting
 # (The coastlines are *really* accurate and would take too long if we tried to plot them as is)
@@ -87,7 +92,9 @@ Temperature_plot<- ggplot(data = subset(Field_NSW_figs, !is.na(Temperature)),
      scale_color_gradient2(low = "royalblue1", mid = "gold1", high = "firebrick1",midpoint = 18, space = "Lab", guide = "colourbar", aesthetics = "colour")+
   scale_x_continuous(limits =  c(140,154)) + 
   scale_y_continuous(limits = c(-38,-28))+
-  theme(panel.background = element_rect(fill = "lightblue"), panel.grid= element_blank())
+  labs(title = "Groundwater temperature (°C)")+
+  theme(panel.background = element_rect(fill = "lightblue"), panel.grid= element_blank(), legend.position = c(0.90, 0.25))
+
 
 
 
@@ -96,65 +103,79 @@ anim_Temperature<-Temperature_plot+
      shadow_mark(past = TRUE, future = FALSE, alpha = alpha/2)
 
 animate(anim_Temperature)
+```
 
+```{r Conductivity plot, out.width='60%', fig.align='center', fig.height= 4, fig.width=6, fig.cap="groundwater conductivity"}
 
 Conductivity_plot<- ggplot(data = subset(Field_NSW_figs, !is.na(Conductivity_group)),
-                 mapping= aes(x= Longitude, 
-                             y= Latitude, 
-                             colour = Conductivity_group))+
-geom_sf(data = state_borders, inherit.aes= F)+
- geom_point()+
- scale_color_brewer(palette ="YlGnBu")+ 
- scale_x_continuous(limits =  c(140,154)) + 
- scale_y_continuous(limits = c(-38,-28))+
-  theme(panel.background = element_rect(fill = "lightblue"), panel.grid= element_blank())
-
-
-pH_plot<- ggplot(data = subset(Field_NSW_figs, !is.na(pH_group)), 
-                 mapping= aes(x= Longitude, 
+                  mapping= aes(x= Longitude, 
                               y= Latitude, 
-                              colour = pH_group))+
-  geom_sf(data = state_borders, inherit.aes= F)+
+                              colour = Conductivity_group))+
+ geom_sf(data = state_borders, inherit.aes= F)+
   geom_point()+
-  scale_color_brewer(palette = "YlOrRd")+
+  scale_color_brewer(palette ="YlGnBu")+ 
   scale_x_continuous(limits =  c(140,154)) + 
   scale_y_continuous(limits = c(-38,-28))+
-  theme(panel.background = element_rect(fill = "lightblue"), panel.grid= element_blank())
+  labs(title= "Groundwater conductivity", colour = "Conductivity")+
+ theme(panel.background = element_rect(fill = "lightblue"), panel.grid= element_blank(), legend.position = c(0.88, 0.25))
 
+ anim_Conductivity<-Conductivity_plot +
+   transition_states(Conductivity)+
+   shadow_mark(past = TRUE, future = FALSE, alpha = alpha/2)
+ 
+ animate(anim_Conductivity)
+```
+
+```{r pH plot, out.width='60%', fig.align='center', fig.height= 4, fig.width=6, fig.cap="groundwater pH"}
+pH_plot<- ggplot(data = subset(Field_NSW_figs,!is.na(pH_group)),
+                  mapping= aes(x= Longitude, 
+                               y= Latitude, 
+                               colour = pH_group))+
+   geom_sf(data = state_borders, inherit.aes= F)+
+   geom_point()+
+   scale_color_brewer(palette = "RdYlGn")+
+   scale_x_continuous(limits =  c(140,154)) + 
+   scale_y_continuous(limits = c(-38,-28))+
+   labs(title = "Groundwater pH", colour = "pH")+
+   theme(panel.background = element_rect(fill = "lightblue"), panel.grid= element_blank(),legend.position = c(0.92, 0.15))
 
 anim_pH<-pH_plot+
     transition_states(pH)+
-     shadow_mark(past = TRUE, future = FALSE, alpha = alpha/2)
+      shadow_mark(past = TRUE, future = FALSE, alpha = alpha/2)
 
-animate(anim_pH)
-
-Eh_plot<- ggplot(data = subset(Field_NSW_figs,!is.na(Eh_group)),
-                 mapping= aes(x= Longitude, 
-                              y= Latitude, 
-                              colour = Eh_group))+
-  geom_sf(data = state_borders, inherit.aes= F)+
-  geom_point()+
-  scale_color_brewer(palette = "RdYlGn")+
-  scale_x_continuous(limits =  c(140,154)) + 
-  scale_y_continuous(limits = c(-38,-28))+
-  theme(panel.background = element_rect(fill = "lightblue"), panel.grid= element_blank())
-
-anim_Eh<-Eh_plot+
-   transition_states(Eh)+
-     shadow_mark(past = TRUE, future = FALSE, alpha = alpha/2)
-
-animate(anim_Eh)
+ animate(anim_pH)
 
 ```
 
-Your figure and table captions are automatically numbered and can be referenced in the text
-if needed: see eg. Table \@ref(tab:mytable) and Figure \@ref(fig:standard-plot)
+```{r Eh plot, out.width='60%', fig.align='center', fig.height= 4, fig.width=6, fig.cap="groundwater Eh"}
+ 
+Eh_plot<- ggplot(data = subset(Field_NSW_figs,!is.na(Eh_group)),
+                  mapping= aes(x= Longitude, 
+                               y= Latitude, 
+                               colour = Eh_group))+
+   geom_sf(data = state_borders, inherit.aes= F)+
+   geom_point()+
+   scale_color_brewer(palette = "RdYlGn")+
+   scale_x_continuous(limits =  c(140,154)) + 
+   scale_y_continuous(limits = c(-38,-28))+
+   labs(title = "Groundwater Eh", colour = "Eh")+
+   theme(panel.background = element_rect(fill = "lightblue"), panel.grid= element_blank(), legend.position = c(0.90, 0.25))
+
+ 
+ anim_Eh<-Eh_plot+
+    transition_states(Eh)+
+      shadow_mark(past = TRUE, future = FALSE, alpha = alpha/2)
+
+ animate(anim_Eh)
+```
+
 
 # My Digital Toolbox
 
 Since starting Data School FOCUS I have used a the following R packages
+
 * tidyverse
-* Dplyr
+* dplyr
 * ggplot
 * gganimate
 * sp (for the Australian map)
@@ -162,17 +183,19 @@ Since starting Data School FOCUS I have used a the following R packages
 
 # My time went ...
 
-My time went into data wrangling... and I have had to let it go in order to be able to get a markdown document ready for the final presentation. Because the dataset I was working with was partly put together by people, partly by machines, and different labs have different format output for their report, this has been particularly challenging. 
+My time went into data wrangling... and I would still be wrangling if I was not advised to let it go in order to be able to get a markdown document ready for the final presentation. Because the dataset I was working with was partly put together by people, partly by machines, and partly supplied by different labs with distinct format output for their report. The data wrangling has been particularly challenging, and still is. 
 
 # Next steps
 
 * I would like to achieve my original objective of writing a script that could handle the data wrangling automatically, supplying us with a tidy dataset. I am also hoping to gain a better understanding of the visualisation potential of R, and make the final visualisation interactive for the reader. 
 
-*The next step for me is also to learn Python, because nobody I work with knows R which strongly limits the collaborations and the support I can receive during my learning.
+* The next step for me is also to learn Python, because nobody I work with knows R which strongly limits the collaborations and the support I can receive during my learning.
 
 
 # My Data School Experience
 
-I really enjoyed the continuous format of this program. While most trainings are condensed over a couple of days, Data School FOCUS allowed for time to actually assimilate the new concepts and practise new skills with strong and personalised support from the teaching team. It  felt like being back at school and having a dedicated time for it every week was great. I have not had the opportunity yet to apply newly acquired skills to my own work. 
-On a more personal and practical aspect, being in WA with the program running in spring, the start at 7 am was definitely a challenge. From a work perspective, continuing my work day at the end of a data school day was difficult as I was struggling focus, and overall my own work got quite delayed.
+* I really enjoyed the continuous format of this program. While most trainings are condensed over a couple of days, Data School FOCUS allowed for time to actually assimilate the new concepts and practise new skills with strong and personalised support from the teaching team. It  felt like being back at school and having a dedicated time for it every week was great. I have not had the opportunity yet to apply newly acquired skills to my own work. 
+* On a more practical aspect, being in WA with the program running in spring, the start at 7 am was definitely a challenge for personal reason (organising childcare drop off) and also logistic issues (organising out of hours access to a building where I never work). 
+* Regarding the program itself, not having an expert in the room for discussions, or even a dedicated helper during the first half of the program has also been hard for motivation. I am glad to have worked alongside another WA colleague, that really helped. 
+
 
