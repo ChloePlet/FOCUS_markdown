@@ -1,6 +1,6 @@
 ---
 title: NSW Groundwater hydrogeochemistry
-subtitle: Field analyses"
+subtitle: Field analyses
 author: Chloe Plet
 affiliation: "CSIRO Mineral Resources - Team: Minerals and Water" # Or group/team
 photo: resources/img/photo.jpeg
@@ -26,11 +26,11 @@ library(ggplot2)
 library(colorspace)
 library(gganimate)
 
-install.packages("gifski")
-install.packages("Rtools")
+
 
 #read files and create dataframes
 Field_NSW<-read_csv("resources/results/Obs_Field_simple.csv")
+Field_NSW_figs<- read_csv("resources/results/Obs_Field_simple_figs.csv")
 ```
 
 
@@ -77,7 +77,7 @@ state_borders <- read_sf("resources/AUS_states") %>%
 
     
 
-Temperature_plot<- ggplot(data = subset(Field_NSW, !is.na(Temperature)),
+Temperature_plot<- ggplot(data = subset(Field_NSW_figs, !is.na(Temperature)),
        mapping=aes(x = Longitude, 
                    y = Latitude,
                    colour = Temperature
@@ -89,7 +89,7 @@ Temperature_plot<- ggplot(data = subset(Field_NSW, !is.na(Temperature)),
   scale_y_continuous(limits = c(-38,-28))+
   theme(panel.background = element_rect(fill = "lightblue"), panel.grid= element_blank())
 
-ggsave("Temperature_plot.eps", plot= Temperature_plot, device = "eps", dpi = 300)
+
 
 anim_Temperature<-Temperature_plot+
     transition_states(Temperature)+
@@ -98,24 +98,25 @@ anim_Temperature<-Temperature_plot+
 animate(anim_Temperature)
 
 
-#Conductivity_plot<- ggplot(data = subset(Field_NSW, !is.na(Conductivity)),
-                 #mapping= aes(x= Longitude, 
-                            #  y= Latitude, 
-                            #  colour = Conductivity))+
-  #geom_sf(data = state_borders, inherit.aes= F)+
- # geom_point()+
- # scale_color_gradient2(low= "cadetblue1", high= "chocolate1", midpoint= 6000, space = "Lab", guide = "colourbar", aesthetics = "colour")+ #need to fix colour scale
-  #scale_x_continuous(limits =  c(140,154)) + 
-  #scale_y_continuous(limits = c(-38,-28))
+Conductivity_plot<- ggplot(data = subset(Field_NSW_figs, !is.na(Conductivity_group)),
+                 mapping= aes(x= Longitude, 
+                             y= Latitude, 
+                             colour = Conductivity_group))+
+geom_sf(data = state_borders, inherit.aes= F)+
+ geom_point()+
+ scale_color_brewer(palette ="YlGnBu")+ 
+ scale_x_continuous(limits =  c(140,154)) + 
+ scale_y_continuous(limits = c(-38,-28))+
+  theme(panel.background = element_rect(fill = "lightblue"), panel.grid= element_blank())
 
 
-pH_plot<- ggplot(data = subset(Field_NSW, !is.na(pH)), 
+pH_plot<- ggplot(data = subset(Field_NSW_figs, !is.na(pH_group)), 
                  mapping= aes(x= Longitude, 
                               y= Latitude, 
-                              colour = pH))+
+                              colour = pH_group))+
   geom_sf(data = state_borders, inherit.aes= F)+
   geom_point()+
-  scale_color_gradient2(low= "gray0", mid = "cyan2", high= "chartreuse", midpoint= 8, space = "Lab", guide = "colourbar", aesthetics = "colour")+
+  scale_color_brewer(palette = "YlOrRd")+
   scale_x_continuous(limits =  c(140,154)) + 
   scale_y_continuous(limits = c(-38,-28))+
   theme(panel.background = element_rect(fill = "lightblue"), panel.grid= element_blank())
@@ -127,13 +128,13 @@ anim_pH<-pH_plot+
 
 animate(anim_pH)
 
-Eh_plot<- ggplot(data = subset(Field_NSW,!is.na(Eh)),
+Eh_plot<- ggplot(data = subset(Field_NSW_figs,!is.na(Eh_group)),
                  mapping= aes(x= Longitude, 
                               y= Latitude, 
-                              colour = Eh))+
+                              colour = Eh_group))+
   geom_sf(data = state_borders, inherit.aes= F)+
   geom_point()+
-  scale_color_gradient2(low = "steelblue1", mid = "hotpink", high = "sienna1", midpoint = 120, space = "Lab", guide = "colourbar", aesthetics = "colour")+
+  scale_color_brewer(palette = "RdYlGn")+
   scale_x_continuous(limits =  c(140,154)) + 
   scale_y_continuous(limits = c(-38,-28))+
   theme(panel.background = element_rect(fill = "lightblue"), panel.grid= element_blank())
@@ -151,37 +152,27 @@ if needed: see eg. Table \@ref(tab:mytable) and Figure \@ref(fig:standard-plot)
 
 # My Digital Toolbox
 
-What digital tools have you been using in your project? Which ones have you learned since starting 
-Data School?
+Since starting Data School FOCUS I have used a the following R packages
+* tidyverse
+* Dplyr
+* ggplot
+* gganimate
+* sp (for the Australian map)
 
-You can use all the usual R markdown features in writing a project summary, including lists:
-
-* R - dplyr, ggplot, ...
-* Python
-* SQL
-
-## Favourite tool (optional)
-
-Is there a tool/package/function in particular that you've enjoyed using? Give it a special shout out here.
-
-![](https://raw.githubusercontent.com/tidyverse/ggplot2/master/man/figures/logo.png){.pull-right width=100px}
-
-No prizes for guessing mine:
 
 # My time went ...
 
-My time went 
+My time went into data wrangling... and I have had to let it go in order to be able to get a markdown document ready for the final presentation. Because the dataset I was working with was partly put together by people, partly by machines, and different labs have different format output for their report, this has been particularly challenging. 
 
 # Next steps
 
-What further steps do you wish your project could take? Or are there any new digital skills that you
-are keen to develop as a result of your involvement in the Data School?
+* I would like to achieve my original objective of writing a script that could handle the data wrangling automatically, supplying us with a tidy dataset. I am also hoping to gain a better understanding of the visualisation potential of R, and make the final visualisation interactive for the reader. 
+
+*The next step for me is also to learn Python, because nobody I work with knows R which strongly limits the collaborations and the support I can receive during my learning.
+
 
 # My Data School Experience
 
-This poster is mostly about your synthesis project. However we would also like to hear about other
-parts of your Data School experience. What aspects of the program did you really enjoy? How have you
-been applying the skills you have learned in your daily work? Have you been able to transfer this 
-knowledge to your team members? Concrete examples demonstrating this would be useful here
-(meetings/talks/collaborations/new roles). Any descriptions of the personal impact the program has 
-had are welcome here as well!
+I really enjoyed the continuous format of this program. While most trainings are condensed over a couple of days, Data School FOCUS allowed for time to actually assimilate the new concepts and practise new skills with strong and personalised support from the teaching team. It  felt like being back at school and having a dedicated time for it every week was great. I have not had the opportunity yet to apply newly acquired skills to my own work. 
+On a more personal and practical aspect, being in WA with the program running in spring, the start at 7 am was definitely a challenge. From a work perspective, continuing my work day at the end of a data school day was difficult as I was struggling focus, and overall my own work got quite delayed.
+
