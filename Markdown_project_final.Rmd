@@ -53,26 +53,23 @@ To do so I aimed to combine field observations and geolocation with a range of l
 
 ## Preliminary results
 
-This section will demonstrate the different visuals you might want use to show off your 
-project. Don't feel the need to go overboard, this is supposed to give a taste of the work you are
-doing rather than being a publication ready document.
 
-To get tables formatting correctly, use `knitr::kable` to convert the table to html format. If
-you also want to have alternate row highlighting, pass the result to `kable_styling('striped')` 
-from the `kableExtra` package.
-
-**Tables**
+**Table**
 ```{r mytable, out.width='100%', echo = T}
 knitr::kable(head(Field_NSW, n = 5), format = "html", caption = "Field data") %>% 
   kable_styling("striped")
 ```
 
-**Images from a file**
+**Photos from the field**
 
-![](resources/img/tidyverse.png){width=100px}
+![](resources/img/groundwater_sampling.jpg){width=200px}
+
+
 
 **Plots from R**
-```{r temperature-plot, out.width='60%', fig.align='center', fig.height= 4, fig.width=6, fig.cap="groundwater temperature"}
+
+
+```{r temperature_plot, out.width='60%', fig.align='center', fig.height= 4, fig.width=6}
   
 # Read the state shapes in and simplify them for faster plotting
 # (The coastlines are *really* accurate and would take too long if we tried to plot them as is)
@@ -88,7 +85,7 @@ Temperature_plot<- ggplot(data = subset(Field_NSW_figs, !is.na(Temperature)),
                    colour = Temperature
                   ))+
   geom_sf(data = state_borders, inherit.aes = F)+
-         geom_point()+
+         geom_point(size = 3)+
      scale_color_gradient2(low = "royalblue1", mid = "gold1", high = "firebrick1",midpoint = 18, space = "Lab", guide = "colourbar", aesthetics = "colour")+
   scale_x_continuous(limits =  c(140,154)) + 
   scale_y_continuous(limits = c(-38,-28))+
@@ -105,14 +102,14 @@ anim_Temperature<-Temperature_plot+
 animate(anim_Temperature)
 ```
 
-```{r Conductivity plot, out.width='60%', fig.align='center', fig.height= 4, fig.width=6, fig.cap="groundwater conductivity"}
+```{r Conductivity_plot, out.width='60%', fig.align='center', fig.height= 4, fig.width=6}
 
 Conductivity_plot<- ggplot(data = subset(Field_NSW_figs, !is.na(Conductivity_group)),
                   mapping= aes(x= Longitude, 
                               y= Latitude, 
                               colour = Conductivity_group))+
  geom_sf(data = state_borders, inherit.aes= F)+
-  geom_point()+
+  geom_point(size = 3)+
   scale_color_brewer(palette ="YlGnBu")+ 
   scale_x_continuous(limits =  c(140,154)) + 
   scale_y_continuous(limits = c(-38,-28))+
@@ -126,13 +123,13 @@ Conductivity_plot<- ggplot(data = subset(Field_NSW_figs, !is.na(Conductivity_gro
  animate(anim_Conductivity)
 ```
 
-```{r pH plot, out.width='60%', fig.align='center', fig.height= 4, fig.width=6, fig.cap="groundwater pH"}
+```{r pH_plot, out.width='60%', fig.align='center', fig.height= 4, fig.width=6}
 pH_plot<- ggplot(data = subset(Field_NSW_figs,!is.na(pH_group)),
                   mapping= aes(x= Longitude, 
                                y= Latitude, 
                                colour = pH_group))+
    geom_sf(data = state_borders, inherit.aes= F)+
-   geom_point()+
+   geom_point(size = 3)+
    scale_color_brewer(palette = "RdYlGn")+
    scale_x_continuous(limits =  c(140,154)) + 
    scale_y_continuous(limits = c(-38,-28))+
@@ -147,14 +144,14 @@ anim_pH<-pH_plot+
 
 ```
 
-```{r Eh plot, out.width='60%', fig.align='center', fig.height= 4, fig.width=6, fig.cap="groundwater Eh"}
+```{r Eh_plot, out.width='60%', fig.align='center', fig.height= 4, fig.width=6}
  
 Eh_plot<- ggplot(data = subset(Field_NSW_figs,!is.na(Eh_group)),
                   mapping= aes(x= Longitude, 
                                y= Latitude, 
                                colour = Eh_group))+
    geom_sf(data = state_borders, inherit.aes= F)+
-   geom_point()+
+   geom_point(size = 3)+
    scale_color_brewer(palette = "RdYlGn")+
    scale_x_continuous(limits =  c(140,154)) + 
    scale_y_continuous(limits = c(-38,-28))+
